@@ -10,6 +10,7 @@
   :root {
     --bg: #f2f5f4; --card: #fff; --ink: #17241f; --muted: #66756f; --line: #dbe3e0;
     --brand: #1f6f5c; --brand-dark: #175546; --brand-soft: #e3f2ed; --red: #c0392b; --red-soft: #fdecea;
+    --fuel: #c76a00; --fuel-soft: #fff3e3;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -34,7 +35,6 @@
   .who .small { color: var(--muted); font-size: 15px; }
   .link-btn { border: 0; background: none; color: var(--brand); font-weight: 700; padding: 8px; }
   .field + .field { margin-top: 14px; }
-  .field .hint { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
   .cats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .cat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 92px; border: 2px solid var(--line); border-radius: 14px; background: #fff; font-weight: 700; font-size: 17px; }
   .cat .emoji { font-size: 34px; line-height: 1; }
@@ -60,11 +60,41 @@
   .steps div { display: flex; gap: 12px; align-items: center; padding: 8px 0; }
   .steps .emoji { font-size: 30px; }
   .summary { color: var(--muted); font-size: 15px; margin-bottom: 18px; }
-  .busy { position: fixed; inset: 0; background: rgba(15,30,25,.55); display: grid; place-items: center; z-index: 10; }
+  .busy { position: fixed; inset: 0; background: rgba(15,30,25,.55); display: grid; place-items: center; z-index: 30; }
   .busy .box { background: #fff; border-radius: 16px; padding: 24px 30px; text-align: center; font-weight: 700; font-size: 19px; min-width: 240px; }
   .spinner { width: 44px; height: 44px; margin: 0 auto 12px; border: 5px solid var(--brand-soft); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .bad-link { text-align: center; padding: 40px 16px; font-size: 19px; }
+
+  /* ---- fuel: gauge photo first ---- */
+  .fuel-card { border: 2px solid #f0c48a; background: var(--fuel-soft); }
+  .fuel-card .label { color: var(--fuel); }
+  .fuel-card .num { background: var(--fuel); }
+  .fuel-rule { font-size: 15px; color: #6b4a1d; margin: -4px 0 12px; }
+  .gauge-btn { width: 100%; min-height: 74px; border: 0; border-radius: 14px; background: var(--fuel); color: #fff; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 14px rgba(199,106,0,.28); }
+  .gauge-btn .emoji { font-size: 30px; }
+  .checks { margin-top: 12px; display: grid; gap: 10px; }
+  .chk { display: flex; align-items: center; gap: 12px; padding: 10px; border: 2px solid #f0c48a; border-radius: 14px; background: #fff; text-align: left; width: 100%; }
+  .chk img, .chk .noimg { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; background: #eee; flex: 0 0 auto; display: grid; place-items: center; font-size: 28px; }
+  .chk .t { flex: 1; min-width: 0; }
+  .chk .t b { display: block; font-size: 22px; }
+  .chk .t span { color: var(--muted); font-size: 14px; }
+  .chk .go { font-weight: 800; color: var(--fuel); white-space: nowrap; }
+  .chk.on { border-color: var(--fuel); box-shadow: inset 0 0 0 2px var(--fuel); }
+  .chk.on .go { color: #fff; background: var(--fuel); border-radius: 10px; padding: 6px 10px; }
+  .need-gauge { padding: 14px; border-radius: 12px; background: var(--fuel-soft); color: #6b4a1d; font-weight: 600; margin-top: 12px; }
+
+  /* camera */
+  .cam { position: fixed; inset: 0; z-index: 20; background: #000; display: flex; flex-direction: column; }
+  .cam .view { position: relative; flex: 1; overflow: hidden; display: grid; place-items: center; }
+  .cam video, .cam .shot { width: 100%; height: 100%; object-fit: contain; }
+  .cam .wm { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 14px; background: rgba(0,0,0,.55); color: #fff; font-weight: 700; line-height: 1.25; pointer-events: none; }
+  .cam .wm .big { font-size: 30px; }
+  .cam .tip { position: absolute; top: 0; left: 0; right: 0; padding: 12px 14px; background: rgba(0,0,0,.55); color: #fff; font-size: 16px; text-align: center; }
+  .cam .bar { display: flex; align-items: center; justify-content: space-around; gap: 10px; padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); background: #111; }
+  .cam .bar button { border: 0; border-radius: 14px; font-weight: 800; font-size: 18px; padding: 14px 18px; background: #333; color: #fff; }
+  .cam .shutter { width: 78px; height: 78px; border-radius: 50% !important; padding: 0 !important; background: #fff !important; box-shadow: 0 0 0 5px #111, 0 0 0 9px #fff; }
+  .cam .use { background: var(--fuel) !important; }
 </style>
 </head>
 <body>
@@ -100,6 +130,14 @@
       </div>
     </div>
 
+    <!-- Fuel: photo of the fuel gauge BEFORE fueling -->
+    <div class="card fuel-card">
+      <div class="label">⛽ Fuel</div>
+      <div class="fuel-rule"><b>Before fueling</b>, take a photo of the <b>fuel gauge</b> here (car on, gauge and km clearly visible).<br>After paying, open this link again and add the receipt to that photo.<br><b>No gauge photo = fuel receipt not accepted.</b></div>
+      <button class="gauge-btn" id="gaugeBtn" type="button"><span class="emoji">📷</span>BEFORE FUELING<br>Photo of fuel gauge</button>
+      <div class="checks" id="checks"></div>
+    </div>
+
     <div class="card">
       <div class="label"><span class="num">3</span>What did you pay for?</div>
       <div class="cats" id="cats">
@@ -108,6 +146,10 @@
         <button class="cat" type="button" data-cat="Car Repair"><span class="emoji">🔧</span>Car Repair</button>
         <button class="cat" type="button" data-cat="Car Wash"><span class="emoji">🚿</span>Car Wash</button>
         <button class="cat" type="button" data-cat="Overtime Meal"><span class="emoji">🍱</span>Overtime Meal</button>
+      </div>
+      <div id="fuelPick" hidden>
+        <div class="need-gauge" id="fuelNone">⛽ No gauge photo yet for this car.<br>Please take the <b>BEFORE FUELING</b> photo first (orange button above).</div>
+        <div id="fuelChoose"><div style="margin:14px 0 8px;font-weight:700">Which gauge photo is this receipt for?</div><div class="checks" id="fuelChecks"></div></div>
       </div>
     </div>
 
@@ -128,12 +170,13 @@
       </div>
       <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
       <input type="file" id="fileInput" accept="image/*" hidden>
+      <input type="file" id="gaugeInput" accept="image/*" capture="environment" hidden>
     </div>
 
     <button class="send" id="send" type="button">SEND ✓</button>
   </div>
 
-  <!-- Done -->
+  <!-- Done: receipt -->
   <div class="card ok-screen" id="done" hidden>
     <div class="check">✓</div>
     <h2>Sent!</h2>
@@ -148,6 +191,37 @@
     <div class="summary" id="summary"></div>
     <button class="send" id="again" type="button">+ New receipt</button>
   </div>
+
+  <!-- Done: gauge photo -->
+  <div class="card ok-screen" id="gaugeDone" hidden>
+    <div class="check" style="background:var(--fuel)">✓</div>
+    <h2>Gauge photo saved</h2>
+    <div class="summary" id="gaugeSummary" style="font-size:17px;color:var(--ink)"></div>
+    <div class="steps">
+      <div><span class="emoji">⛽</span><span><b>Now fuel the car</b> and pay</span></div>
+      <div><span class="emoji">🔗</span><span>Then <b>open this link again</b> and tap <b>Add receipt</b> on this photo</span></div>
+    </div>
+    <button class="send" id="gaugeBack" type="button" style="background:var(--fuel)">OK</button>
+  </div>
+</div>
+
+<!-- Watermark camera -->
+<div class="cam" id="cam" hidden>
+  <div class="view">
+    <video id="camVideo" playsinline muted autoplay></video>
+    <img class="shot" id="camShot" alt="" hidden>
+    <div class="tip" id="camTip">Show the <b>fuel gauge</b> and <b>km</b> clearly</div>
+    <div class="wm" id="camWm"></div>
+  </div>
+  <div class="bar" id="camLive">
+    <button type="button" id="camCancel">✕ Cancel</button>
+    <button type="button" class="shutter" id="camSnap" aria-label="Take photo"></button>
+    <span style="width:96px"></span>
+  </div>
+  <div class="bar" id="camReview" hidden>
+    <button type="button" id="camRetake">↺ Again</button>
+    <button type="button" class="use" id="camUse">✓ Use this photo</button>
+  </div>
 </div>
 
 <div class="busy" id="busy" hidden><div class="box"><div class="spinner"></div><span id="busyText">Sending…</span></div></div>
@@ -156,11 +230,13 @@
 // ===== Settings (filled in by the office) =====
 const SUPABASE_URL = "https://klltpjccnretfccnrvpo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_xFOiQOnp0CbPfwu18oN1xQ_exb8LpF9";
+const GAUGE_MAX_AGE_MIN = 5;   // phone without web camera: the photo must be taken within the last 5 minutes
 // ==============================================
 
 const $ = id => document.getElementById(id);
 const accessKey = new URLSearchParams(location.search).get("k") || "";
-const state = { category: "", photo: null, uploadedPath: "", uploadedFor: null };
+const state = { category: "", photo: null, uploadedPath: "", uploadedFor: null, check: null, checks: [], offset: 0 };
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function store(key, value) {
   try { if (value === undefined) return localStorage.getItem(key) || ""; localStorage.setItem(key, value); } catch (e) { return ""; }
@@ -176,6 +252,39 @@ function showError(text) {
   if (text) window.scrollTo({ top: 0, behavior: "smooth" });
 }
 function busy(text) { $("busy").hidden = !text; if (text) $("busyText").textContent = text; }
+const pad = n => String(n).padStart(2, "0");
+const serverNow = () => new Date(Date.now() + state.offset);
+const hhmm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const dayText = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${DAYS[d.getDay()]}`;
+const esc = s => String(s).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+
+async function rpc(name, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: "POST", headers: headers({ "Content-Type": "application/json" }), body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text);
+  return JSON.parse(text);
+}
+async function uploadPhoto(folder, blob) {
+  const path = `${folder}/${uuid()}.jpg`;
+  const up = await fetch(`${SUPABASE_URL}/storage/v1/object/receipts/${path}`, {
+    method: "POST", headers: headers({ "Content-Type": "image/jpeg", "x-upsert": "false" }), body: blob,
+  });
+  if (!up.ok) throw new Error("UPLOAD_" + up.status + " " + (await up.text()).slice(0, 200));
+  return path;
+}
+function explain(err, again) {
+  const msg = String(err && err.message || err);
+  if (msg.includes("BAD_LINK")) return "This link is old or wrong. Please ask the office for the new link.";
+  if (msg.includes("TOO_MANY")) return "Too many photos were sent. Please try again later.";
+  if (msg.includes("NEED_GAUGE")) return "Fuel receipt needs a <b>gauge photo taken before fueling</b>. Please choose one, or take it first next time.";
+  if (msg.includes("GAUGE_USED")) return "This gauge photo already has a receipt. Each fuel-up needs its own gauge photo.";
+  if (msg.includes("GAUGE_OLD")) return "This gauge photo is older than 24 hours and cannot be used.";
+  if (msg.includes("NO_PHOTO")) { state.uploadedPath = ""; return `The photo did not arrive. Please press <b>${again}</b> again.`; }
+  if (err instanceof TypeError) return `No internet. Please check your internet and press <b>${again}</b> again.`;
+  return `Something went wrong. Please press <b>${again}</b> again.<br><small style='font-weight:400'>` + msg.replace(/[<>&]/g, "").slice(0, 120) + "</small>";
+}
 
 // ----- name + plate (remembered)
 function showWho() {
@@ -187,15 +296,82 @@ function showWho() {
   $("whoPlate").textContent = plate;
   $("whoName").textContent = driver;
 }
+function who() {
+  const driver = $("driver").value.trim(), plate = $("plate").value.trim().toUpperCase();
+  if (!driver) { $("whoEdit").hidden = false; $("whoSaved").hidden = true; showError("Please write <b>your name</b>."); return null; }
+  if (!plate) { $("whoEdit").hidden = false; $("whoSaved").hidden = true; showError("Please write the <b>car plate number</b>."); return null; }
+  return { driver, plate };
+}
 $("whoChange").onclick = () => { $("whoSaved").hidden = true; $("whoEdit").hidden = false; $("driver").focus(); };
 $("plate").addEventListener("input", e => { e.target.value = e.target.value.toUpperCase(); });
+$("plate").addEventListener("change", () => loadChecks());
+
+// ----- open gauge photos for this car (also gives the server time for the watermark)
+function thumbs() { try { return JSON.parse(store("gaugeThumbs") || "{}"); } catch (e) { return {}; } }
+function saveThumb(id, dataUrl) {
+  const all = thumbs(); all[id] = { img: dataUrl, t: Date.now() };
+  const keep = Object.entries(all).sort((a, b) => b[1].t - a[1].t).slice(0, 8);
+  try { store("gaugeThumbs", JSON.stringify(Object.fromEntries(keep))); } catch (e) {}
+}
+async function loadChecks() {
+  const plate = $("plate").value.trim().toUpperCase();
+  try {
+    const sent = Date.now();
+    const data = await rpc("open_fuel_checks", { p_key: accessKey, p_plate: plate });
+    state.offset = new Date(data.now).getTime() - Math.round((sent + Date.now()) / 2);
+    state.checks = plate ? data.checks || [] : [];
+    if (state.check && !state.checks.some(c => c.id === state.check.id)) state.check = null;
+    renderChecks();
+  } catch (err) {
+    if (String(err.message || err).includes("BAD_LINK")) showError(explain(err, "SEND"));
+  }
+}
+function checkRow(c, mode) {
+  const t = new Date(c.created_at), img = (thumbs()[c.id] || {}).img;
+  const on = mode === "pick" && state.check && state.check.id === c.id;
+  return `<button type="button" class="chk ${on ? "on" : ""}" data-check="${esc(c.id)}">
+    ${img ? `<img src="${img}" alt="">` : `<span class="noimg">⛽</span>`}
+    <span class="t"><b>${hhmm(t)}</b><span>Gauge photo · ${dayText(t)} · #${esc(c.code)}</span></span>
+    <span class="go">${mode === "pick" ? (on ? "✓ Chosen" : "Choose") : "Add receipt →"}</span></button>`;
+}
+function renderChecks() {
+  $("checks").innerHTML = state.checks.length
+    ? `<div style="font-weight:700;margin-top:4px">Waiting for receipt:</div>` + state.checks.map(c => checkRow(c, "list")).join("")
+    : "";
+  const fuel = state.category === "Fuel";
+  $("fuelPick").hidden = !fuel;
+  $("fuelNone").hidden = state.checks.length > 0;
+  $("fuelChoose").hidden = !state.checks.length;
+  $("fuelChecks").innerHTML = state.checks.map(c => checkRow(c, "pick")).join("");
+}
+function chooseCheck(id) {
+  state.check = state.checks.find(c => c.id === id) || null;
+  setCategory("Fuel");
+}
+$("checks").addEventListener("click", e => {
+  const b = e.target.closest(".chk");
+  if (!b) return;
+  chooseCheck(b.dataset.check);
+  showError("");
+  $("amount").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+$("fuelChecks").addEventListener("click", e => {
+  const b = e.target.closest(".chk");
+  if (b) chooseCheck(b.dataset.check);
+});
 
 // ----- category
+function setCategory(cat) {
+  state.category = cat;
+  if (cat === "Fuel" && !state.check && state.checks.length === 1) state.check = state.checks[0];
+  document.querySelectorAll(".cat").forEach(x => x.classList.toggle("on", x.dataset.cat === cat));
+  renderChecks();
+}
 $("cats").addEventListener("click", e => {
   const b = e.target.closest(".cat");
   if (!b) return;
-  state.category = b.dataset.cat;
-  document.querySelectorAll(".cat").forEach(x => x.classList.toggle("on", x === b));
+  setCategory(b.dataset.cat);
+  if (b.dataset.cat === "Fuel") loadChecks();
 });
 
 // ----- amount: allow digits and one dot (also Arabic digits)
@@ -206,7 +382,7 @@ $("amount").addEventListener("input", e => {
   e.target.value = v;
 });
 
-// ----- photo: shrink on the phone so it uploads fast on weak internet
+// ----- receipt photo: shrink on the phone so it uploads fast on weak internet
 $("takePhoto").onclick = () => $("camInput").click();
 $("pickPhoto").onclick = () => $("fileInput").click();
 $("retake").onclick = () => $("camInput").click();
@@ -254,13 +430,173 @@ function uuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
 }
 
-// ----- send
+// ----- watermark camera (gauge photo before fueling)
+const cam = { stream: null, timer: 0, pos: null, posWatch: null, canvas: null, blob: null, shotAt: null, live: true, who: null };
+function wmLines(d) {
+  const p = cam.pos;
+  return [
+    `${hhmm(d)}:${pad(d.getSeconds())}`,
+    `${dayText(d)}  ·  BEFORE FUELING`,
+    `${cam.who.plate}  ·  ${cam.who.driver}`,
+    p ? `GPS ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)} (±${Math.round(p.acc)} m)` : "GPS: location off",
+  ];
+}
+function liveWm() {
+  const l = wmLines(serverNow());
+  $("camWm").innerHTML = `<div class="big">${l[0]}</div>${esc(l[1])}<br>${esc(l[2])}<br>${esc(l[3])}`;
+}
+function startGps() {
+  if (!navigator.geolocation) return;
+  try {
+    cam.posWatch = navigator.geolocation.watchPosition(
+      p => { cam.pos = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }; },
+      () => {}, { enableHighAccuracy: true, maximumAge: 30000, timeout: 15000 });
+  } catch (e) {}
+}
+function stopCam() {
+  clearInterval(cam.timer);
+  if (cam.stream) cam.stream.getTracks().forEach(t => t.stop());
+  cam.stream = null;
+  if (cam.posWatch != null && navigator.geolocation) navigator.geolocation.clearWatch(cam.posWatch);
+  cam.posWatch = null;
+  $("camVideo").srcObject = null;
+  $("cam").hidden = true;
+  document.body.style.overflow = "";
+}
+function camReview(dataUrl) {
+  $("camShot").src = dataUrl;
+  $("camShot").hidden = false; $("camVideo").hidden = true;
+  $("camWm").hidden = true; $("camTip").hidden = true;
+  $("camLive").hidden = true; $("camReview").hidden = false;
+}
+async function openCam() {
+  showError("");
+  cam.who = who();
+  if (!cam.who) return;
+  store("driver", cam.who.driver); store("plate", cam.who.plate);
+  loadChecks();
+  cam.pos = null; cam.blob = null;
+  startGps();
+  if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+    cam.live = false;          // old phone: use the normal camera app, photo must be brand new
+    $("gaugeInput").click();
+    return;
+  }
+  try {
+    cam.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+  } catch (err) {
+    stopCam();
+    return showError("The camera did not open. Close other camera apps, and <b>allow the camera</b> for this page (tap the 🔒 or ⓘ next to the web address → Camera → Allow), then press the orange button again.");
+  }
+  cam.live = true;
+  $("camVideo").srcObject = cam.stream;
+  $("camVideo").hidden = false; $("camShot").hidden = true;
+  $("camWm").hidden = false; $("camTip").hidden = false;
+  $("camLive").hidden = false; $("camReview").hidden = true;
+  $("cam").hidden = false;
+  document.body.style.overflow = "hidden";
+  liveWm();
+  cam.timer = setInterval(liveWm, 500);
+}
+function stamp(source, w, h) {
+  // draw the picture + burn the watermark into it
+  const scale = Math.min(1, 1600 / Math.max(w, h));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(w * scale); canvas.height = Math.round(h * scale);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+  const d = serverNow(), lines = wmLines(d);
+  const u = Math.min(canvas.width, canvas.height) / 30;
+  const band = u * 6.2;
+  ctx.fillStyle = "rgba(0,0,0,0.58)";
+  ctx.fillRect(0, canvas.height - band, canvas.width, band);
+  ctx.fillStyle = "#ffb347";
+  ctx.fillRect(0, canvas.height - band, u * 0.35, band);
+  ctx.fillStyle = "#fff";
+  ctx.textBaseline = "top";
+  let y = canvas.height - band + u * 0.45;
+  ctx.font = `800 ${u * 2}px system-ui, sans-serif`;
+  ctx.fillText(lines[0], u * 0.9, y); y += u * 2.25;
+  ctx.font = `700 ${u}px system-ui, sans-serif`;
+  for (const line of lines.slice(1)) { ctx.fillText(line, u * 0.9, y); y += u * 1.15; }
+  cam.shotAt = d;
+  cam.canvas = canvas;
+  return canvas;
+}
+$("gaugeBtn").onclick = openCam;
+$("camCancel").onclick = stopCam;
+$("camSnap").onclick = () => {
+  const v = $("camVideo");
+  if (!v.videoWidth) return;
+  const canvas = stamp(v, v.videoWidth, v.videoHeight);
+  clearInterval(cam.timer);
+  if (cam.stream) cam.stream.getTracks().forEach(t => t.stop());
+  cam.stream = null;
+  camReview(canvas.toDataURL("image/jpeg", 0.85));
+};
+$("camRetake").onclick = () => { stopCam(); openCam(); };
+$("camUse").onclick = () => sendGauge();
+$("gaugeInput").addEventListener("change", async e => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return stopCam();
+  const ageMin = (Date.now() - (file.lastModified || 0)) / 60000;
+  if (!(ageMin >= -2 && ageMin <= GAUGE_MAX_AGE_MIN)) {
+    stopCam();
+    return showError("This photo is not new. Please take a <b>new photo of the fuel gauge now</b> (do not choose an old photo).");
+  }
+  busy("Preparing photo…");
+  try {
+    const img = await loadImage(file);
+    stamp(img, img.naturalWidth, img.naturalHeight);
+    busy("");
+    await sendGauge();
+  } catch (err) {
+    busy(""); stopCam();
+    showError("Could not read this photo. Please try again.");
+  }
+});
+async function sendGauge() {
+  busy("Sending gauge photo…");
+  try {
+    const blob = await new Promise(r => cam.canvas.toBlob(r, "image/jpeg", 0.82));
+    const path = await uploadPhoto("gauge", blob);
+    busy("Saving…");
+    const p = cam.pos;
+    const res = await rpc("start_fuel", {
+      p_key: accessKey, p_driver: cam.who.driver, p_plate: cam.who.plate, p_photo: path,
+      p_phone_time: new Date().toISOString(), p_lat: p ? p.lat : null, p_lng: p ? p.lng : null,
+      p_accuracy: p ? p.acc : null, p_live: cam.live,
+    });
+    const small = document.createElement("canvas");
+    const k = 160 / Math.max(cam.canvas.width, cam.canvas.height);
+    small.width = Math.round(cam.canvas.width * k); small.height = Math.round(cam.canvas.height * k);
+    small.getContext("2d").drawImage(cam.canvas, 0, 0, small.width, small.height);
+    saveThumb(res.id, small.toDataURL("image/jpeg", 0.6));
+    stopCam();
+    const t = new Date(res.created_at);
+    $("gaugeSummary").innerHTML = `⛽ ${esc(cam.who.plate)} · <b>${hhmm(t)}</b> · ${dayText(t)}<br>#${esc(res.code)}`;
+    $("form").hidden = true; $("gaugeDone").hidden = false;
+    window.scrollTo(0, 0);
+    loadChecks();
+  } catch (err) {
+    stopCam();
+    showError(explain(err, "BEFORE FUELING"));
+  } finally { busy(""); }
+}
+$("gaugeBack").onclick = () => { $("gaugeDone").hidden = true; $("form").hidden = false; showWho(); window.scrollTo(0, 0); };
+
+// ----- send receipt
 $("send").onclick = async () => {
-  const driver = $("driver").value.trim(), plate = $("plate").value.trim().toUpperCase();
+  const w = who();
+  if (!w) return;
+  const { driver, plate } = w;
   const amount = Number($("amount").value);
-  if (!driver) { $("whoEdit").hidden = false; $("whoSaved").hidden = true; return showError("Please write <b>your name</b>."); }
-  if (!plate) { $("whoEdit").hidden = false; $("whoSaved").hidden = true; return showError("Please write the <b>car plate number</b>."); }
   if (!state.category) return showError("Please choose <b>what you paid for</b> (Fuel, Parking…).");
+  if (state.category === "Fuel" && !state.check) {
+    $("fuelPick").scrollIntoView({ behavior: "smooth", block: "center" });
+    return showError(state.checks.length ? "Please choose the <b>gauge photo</b> for this fuel receipt." : "Fuel receipt needs a <b>gauge photo taken before fueling</b>. Without it the fuel receipt is not accepted.");
+  }
   if (!(amount > 0) || amount > 50000) return showError("Please write the <b>amount</b> in SAR.");
   if (!state.photo) return showError("Please take a <b>photo of the receipt</b>.");
   showError("");
@@ -269,33 +605,23 @@ $("send").onclick = async () => {
   try {
     if (!state.uploadedPath || state.uploadedFor !== state.photo) {
       busy("Sending photo…");
-      const path = `incoming/${uuid()}.jpg`;
-      const up = await fetch(`${SUPABASE_URL}/storage/v1/object/receipts/${path}`, {
-        method: "POST", headers: headers({ "Content-Type": "image/jpeg", "x-upsert": "false" }), body: state.photo,
-      });
-      if (!up.ok) throw new Error("UPLOAD_" + up.status + " " + (await up.text()).slice(0, 200));
-      state.uploadedPath = path; state.uploadedFor = state.photo;
+      state.uploadedPath = await uploadPhoto("incoming", state.photo);
+      state.uploadedFor = state.photo;
     }
     busy("Saving…");
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_receipt`, {
-      method: "POST", headers: headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ p_key: accessKey, p_driver: driver, p_plate: plate, p_category: state.category, p_amount: amount, p_photo: state.uploadedPath }),
+    const fuelCheck = state.category === "Fuel" ? state.check : null;
+    const code = await rpc("submit_receipt", {
+      p_key: accessKey, p_driver: driver, p_plate: plate, p_category: state.category, p_amount: amount,
+      p_photo: state.uploadedPath, p_check: fuelCheck ? fuelCheck.id : null,
     });
-    const text = await res.text();
-    if (!res.ok) throw new Error(text);
-    const code = JSON.parse(text);
     $("code").textContent = code;
-    $("summary").textContent = `${state.category} · SAR ${amount.toFixed(2)} · ${plate}`;
+    $("summary").textContent = `${state.category} · SAR ${amount.toFixed(2)} · ${plate}` + (fuelCheck ? ` · gauge photo ${hhmm(new Date(fuelCheck.created_at))}` : "");
     $("form").hidden = true;
     $("done").hidden = false;
     window.scrollTo(0, 0);
   } catch (err) {
-    const msg = String(err && err.message || err);
-    if (msg.includes("BAD_LINK")) showError("This link is old or wrong. Please ask the office for the new link.");
-    else if (msg.includes("TOO_MANY")) showError("Too many receipts were sent. Please try again later.");
-    else if (msg.includes("NO_PHOTO")) { state.uploadedPath = ""; showError("The photo did not arrive. Please press SEND again."); }
-    else if (err instanceof TypeError) showError("No internet. Please check your internet and press <b>SEND</b> again.");
-    else showError("Something went wrong. Please press <b>SEND</b> again.<br><small style='font-weight:400'>" + msg.replace(/[<>&]/g, "").slice(0, 120) + "</small>");
+    showError(explain(err, "SEND"));
+    if (/GAUGE/.test(String(err.message))) { state.check = null; loadChecks(); }
   } finally {
     busy("");
     $("send").disabled = false;
@@ -303,17 +629,17 @@ $("send").onclick = async () => {
 };
 
 $("again").onclick = () => {
-  state.category = ""; state.photo = null; state.uploadedPath = ""; state.uploadedFor = null;
+  state.category = ""; state.photo = null; state.uploadedPath = ""; state.uploadedFor = null; state.check = null;
   document.querySelectorAll(".cat").forEach(x => x.classList.remove("on"));
   $("amount").value = "";
   $("photoPreview").hidden = true; $("photoBtns").hidden = false;
   $("done").hidden = true; $("form").hidden = false;
-  showWho(); showError("");
+  showWho(); showError(""); loadChecks();
   window.scrollTo(0, 0);
 };
 
 if (!accessKey) $("badLink").hidden = false;
-else { $("form").hidden = false; showWho(); }
+else { $("form").hidden = false; showWho(); loadChecks(); }
 </script>
 </body>
 </html>
