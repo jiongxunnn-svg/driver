@@ -14,6 +14,7 @@
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
+  html, body { overflow-x: hidden; }
   html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif; }
   button { font: inherit; color: inherit; }
   .wrap { max-width: 640px; margin: 0 auto; padding: 0 12px calc(24px + env(safe-area-inset-bottom)); }
@@ -56,6 +57,20 @@
   .day b { color: var(--text); }
   .list { overflow: hidden; border-radius: 12px; background: var(--card); }
   .item { display: flex; gap: 11px; width: 100%; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; cursor: pointer; }
+  .item.got { background: #fbfefc; }
+  .pp { flex: 0 0 auto; align-self: center; min-width: 62px; height: 38px; padding: 0 8px; border: 1px solid #f1c48f; border-radius: 9px; background: #fff8ef; color: var(--orange); font-size: 12px; font-weight: 700; line-height: 1.15; cursor: pointer; }
+  .pp.on { border-color: #a9dfc2; background: #e9f8f0; color: var(--green); }
+  .paperbar { display: flex; gap: 6px; margin-top: 12px; }
+  .paperbar button { flex: 1; min-width: 0; height: 46px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+  .paperbar button b { display: block; font-size: 15px; color: var(--text); line-height: 1.2; }
+  .paperbar button.on { border-color: var(--blue); background: #eef1ff; color: var(--blue); }
+  .paperbar button.on b { color: var(--blue); }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 40; transform: translateX(-50%); max-width: 90%; padding: 9px 16px; border-radius: 10px; background: rgba(20,26,38,.92); color: #fff; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .toast.on { opacity: 1; }
+  .spin { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .v-paper { width: 100%; height: 42px; margin-top: 8px; border: 0; border-radius: 10px; background: #ffb257; color: #3a2100; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .v-paper.on { background: #2fb36f; color: #fff; }
   .item:last-child { border-bottom: 0; }
   .item:active { background: #f6f7fb; }
   .thumb { position: relative; width: 58px; height: 58px; flex: 0 0 58px; overflow: hidden; border-radius: 8px; background: #e9ecf2; color: var(--faint); font-size: 10px; display: flex; align-items: center; justify-content: center; text-align: center; }
@@ -79,19 +94,23 @@
   .err { color: var(--red); font-size: 13px; min-height: 18px; }
 
   /* 看大图 */
-  .viewer { position: fixed; inset: 0; z-index: 20; display: none; flex-direction: column; background: #0d1017; color: #fff; }
+  .viewer { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; z-index: 20; display: none; flex-direction: column; overflow: hidden; background: #0d1017; color: #fff; }
   .viewer.show { display: flex; }
-  .v-top { display: flex; align-items: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top)) 10px 8px; }
+  /* 按钮放在下面：顶上会被手机状态栏挡住，而且下面手指好按 */
+  .v-top { display: flex; align-items: center; gap: 8px; padding: 6px 12px calc(10px + env(safe-area-inset-bottom)); background: #161b25; }
+  .v-top .round { width: 44px; height: 40px; font-size: 22px; }
   .v-top .round { background: rgba(255,255,255,.12); color: #fff; }
-  .v-tabs { flex: 1; display: flex; justify-content: center; gap: 6px; }
-  .v-tab { height: 30px; padding: 0 12px; border: 0; border-radius: 15px; background: rgba(255,255,255,.12); color: #cfd5e2; font-size: 13px; cursor: pointer; }
+  .v-back { flex: 0 0 auto; height: 40px; padding: 0 14px 0 10px; border: 0; border-radius: 18px; background: #fff; color: #111; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .v-tabs { flex: 1; min-width: 0; display: flex; justify-content: center; gap: 6px; }
+  .v-tab { height: 32px; padding: 0 10px; white-space: nowrap; border: 0; border-radius: 15px; background: rgba(255,255,255,.12); color: #cfd5e2; font-size: 13px; cursor: pointer; }
   .v-tab.on { background: #fff; color: #111; font-weight: 600; }
   .stage { position: relative; flex: 1; overflow: hidden; touch-action: none; display: flex; align-items: center; justify-content: center; }
   .stage img { max-width: 100%; max-height: 100%; transform-origin: center center; user-select: none; -webkit-user-drag: none; will-change: transform; }
   .stage .none { color: #8d96a8; }
-  .zoom-pct { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); padding: 2px 10px; border-radius: 10px; background: rgba(0,0,0,.55); font-size: 12px; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  .zoom-pct { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); padding: 2px 10px; border-radius: 10px; background: rgba(0,0,0,.55); font-size: 12px; opacity: 0; transition: opacity .3s; pointer-events: none; }
   .zoom-pct.on { opacity: 1; }
-  .v-info { padding: 10px 14px calc(12px + env(safe-area-inset-bottom)); background: #161b25; font-size: 13px; color: #c3cad8; }
+  .v-info { padding: 10px 14px 4px; background: #161b25; font-size: 13px; color: #c3cad8; overflow-wrap: anywhere; }
+  .v-info .big span:last-child { white-space: nowrap; margin-left: 10px; }
   .v-info .big { display: flex; justify-content: space-between; color: #fff; font-size: 16px; font-weight: 700; }
   .v-info a { color: #8fb0ff; }
   .v-hint { color: #7d879a; font-size: 11px; margin-top: 4px; }
@@ -108,16 +127,17 @@
   </div>
 </header>
 <div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
 
 <div class="viewer" id="viewer">
+  <div class="stage" id="stage"><div class="zoom-pct" id="zoomPct"></div></div>
+  <div class="v-info" id="vInfo"></div>
   <div class="v-top">
-    <button class="round" id="vClose" aria-label="关闭">✕</button>
+    <button class="v-back" id="vClose">‹ 返回</button>
     <div class="v-tabs" id="vTabs"></div>
     <button class="round" id="vPrev" aria-label="上一张">‹</button>
     <button class="round" id="vNext" aria-label="下一张">›</button>
   </div>
-  <div class="stage" id="stage"><div class="zoom-pct" id="zoomPct"></div></div>
-  <div class="v-info" id="vInfo"></div>
 </div>
 
 <script>
@@ -133,10 +153,17 @@ const money = n => Number(n || 0).toLocaleString("en-US", { minimumFractionDigit
 const pad = n => String(n).padStart(2, "0");
 const hm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 const photoUrl = path => `${SUPABASE_URL}/storage/v1/object/public/receipts/${path}`;
+let toastTimer = 0;
+function toast(msg, ms = 2500) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), ms); }
+function headers() {
+  const h = { apikey: SUPABASE_KEY, "Content-Type": "application/json" };
+  if (SUPABASE_KEY.startsWith("eyJ")) h.Authorization = "Bearer " + SUPABASE_KEY;
+  return h;
+}
 function store(k, v) { try { v === undefined ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
 function load(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
 
-const state = { key: "", month: new Date(), items: [], waiting: [], by: "cat", pick: "", q: "", loading: false };
+const state = { key: "", month: new Date(), items: [], waiting: [], by: "cat", pick: "", q: "", paper: "all", loading: false, at: null };
 state.month.setDate(1);
 
 // 口令：链接里的 ?v=… 或者手动输入一次，之后记在这台手机上
@@ -162,8 +189,9 @@ function gate(error) {
   $("keyInput").onkeydown = e => { if (e.key === "Enter") go(); };
 }
 
-async function fetchMonth() {
+async function fetchMonth(quiet = false) {
   if (!state.key) return gate();
+  if (quiet && state.loading) return;
   $("monthBox").hidden = $("reload").hidden = false;
   const m = state.month;
   $("monthLabel").textContent = `${m.getFullYear()}年${m.getMonth() + 1}月`;
@@ -172,11 +200,10 @@ async function fetchMonth() {
   if (!state.items.length) $("app").innerHTML = `<div class="msg">正在加载…</div>`;
   const ask = `${from.toISOString()}|${to.toISOString()}`;
   state.ask = ask;
+  $("reload").classList.add("spin");
   try {
-    const h = { apikey: SUPABASE_KEY, "Content-Type": "application/json" };
-    if (SUPABASE_KEY.startsWith("eyJ")) h.Authorization = "Bearer " + SUPABASE_KEY;
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/view_receipts`, {
-      method: "POST", headers: h, body: JSON.stringify({ p_key: state.key, p_from: from.toISOString(), p_to: to.toISOString() }),
+      method: "POST", headers: headers(), cache: "no-store", body: JSON.stringify({ p_key: state.key, p_from: from.toISOString(), p_to: to.toISOString() }),
     });
     const text = await res.text();
     if (state.ask !== ask) return;
@@ -186,19 +213,66 @@ async function fetchMonth() {
       throw new Error("服务器返回错误 " + res.status);
     }
     const data = JSON.parse(text);
-    state.items = (data.items || []).map(x => Object.assign(x, { at: new Date(x.created_at), name: CATS[x.category] || x.category, amount: Number(x.amount) }));
+    // 类别、金额以电脑上票夹里的为准（电脑改过就显示改过的）
+    state.items = (data.items || []).map(x => Object.assign(x, { at: new Date(x.created_at), name: x.pc_category || CATS[x.category] || x.category,
+      amount: Number(x.amount), driverAmount: Number(x.driver_amount ?? x.amount), paper: !!x.paper }));
     state.waiting = (data.waiting || []).map(x => Object.assign(x, { at: new Date(x.created_at) }));
-    render();
+    state.at = new Date();
+    if (quiet) refreshQuietly(); else render();
+    if (state.manual) toast("已刷新，和电脑上一致");
+    state.manual = false;
   } catch (e) {
     if (state.ask !== ask) return;
+    if (quiet) return;   // 自动刷新失败不打扰，下次再试
     $("app").innerHTML = `<div class="msg">😕 ${esc(e.message === "Failed to fetch" ? "连不上网络，请稍后点右上角 ↻ 再试" : e.message)}</div>`;
-  } finally { state.loading = false; }
+  } finally { state.loading = false; $("reload").classList.remove("spin"); }
+}
+// 自动刷新：正在打字、正在看大图时不重画整页，免得打断
+function refreshQuietly() {
+  if (document.activeElement && document.activeElement.id === "q") return renderList();
+  if ($("viewer").classList.contains("show")) return;
+  const y = window.scrollY;
+  render();
+  window.scrollTo(0, y);
+}
+setInterval(() => { if (document.visibilityState === "visible" && state.key && !$("viewer").classList.contains("show")) fetchMonth(true); }, 20000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && state.key && state.at && Date.now() - state.at > 5000) fetchMonth(true); });
+
+// 标记纸质票收到 / 没收到：手机上先改，再告诉云端；电脑上的票夹十几秒内跟着改
+async function setPaper(x, value) {
+  const old = x.paper;
+  x.paper = value;
+  paintPaper(x);
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/set_paper`, {
+      method: "POST", headers: headers(), body: JSON.stringify({ p_key: state.key, p_code: x.code, p_received: value }),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      if (res.status === 404 || text.includes("PGRST202")) throw new Error("云端还没更新：请先在 Supabase 运行新版建表脚本");
+      if (text.includes("NOT_FOUND")) throw new Error("这张票已经在电脑上删掉了");
+      if (text.includes("BAD_LINK")) throw new Error("口令不对");
+      throw new Error("服务器返回错误 " + res.status);
+    }
+    toast(value ? `#${x.code} 已标记：收到纸质票` : `#${x.code} 已改回：没收到纸质票`);
+  } catch (e) {
+    x.paper = old;
+    paintPaper(x);
+    toast("没改成：" + (e.message === "Failed to fetch" ? "连不上网络" : e.message), 4000);
+  }
+}
+function paintPaper(x) {
+  if ($("viewer").classList.contains("show") && V.list[V.i] === x) showItem(V.tab);
+  const y = window.scrollY;
+  render();
+  window.scrollTo(0, y);
 }
 
 function groupKey(x) { return state.by === "cat" ? x.name : state.by === "plate" ? x.plate : x.driver; }
 function filtered() {
   const q = state.q.toLowerCase();
   return state.items.filter(x => (!state.pick || groupKey(x) === state.pick)
+    && (state.paper === "all" || (state.paper === "yes") === x.paper)
     && (!q || `${x.plate} ${x.driver} ${x.code} ${x.name} ${x.amount}`.toLowerCase().includes(q)));
 }
 
@@ -217,9 +291,9 @@ function render() {
   const noGauge = all.filter(x => x.category === "Fuel" && !x.gauge).length;
 
   let html = `<div class="card">
-    <div class="total-label">本月合计（司机填报金额）</div>
+    <div class="total-label">本月合计（和电脑上票夹一致）</div>
     <div class="total"><small>SAR</small>${money(total)}</div>
-    <div class="total-sub">共 ${all.length} 笔 · ${new Set(all.map(x => x.driver)).size} 位司机 · ${new Set(all.map(x => x.plate)).size} 辆车</div>
+    <div class="total-sub">共 ${all.length} 笔 · ${new Set(all.map(x => x.driver)).size} 位司机 · ${new Set(all.map(x => x.plate)).size} 辆车${state.at ? ` · ${hm(state.at)} 更新` : ""}</div>
     <div class="seg">${[["cat", "按类别"], ["plate", "按车辆"], ["driver", "按司机"]].map(([k, t]) => `<button data-by="${k}" class="${state.by === k ? "on" : ""}">${t}</button>`).join("")}</div>
     ${rows.map(g => `<button class="brk ${state.pick === g.k ? "on" : ""}" data-pick="${esc(g.k)}">
       <div class="brk-top"><span class="brk-name">${esc(g.k)}</span><span class="brk-n">${g.n} 笔 · ${total ? Math.round(g.sum / total * 100) : 0}%</span><span class="brk-amt">${money(g.sum)}</span></div>
@@ -233,6 +307,9 @@ function render() {
       ${noGauge ? `<div style="padding-top:8px;opacity:.8">没有油量照片的油费，多半是加油前拍照功能上线以前交的。</div>` : ""}</details>`;
   }
 
+  const got = all.filter(x => x.paper).length;
+  html += `<div class="paperbar">${[["all", "全部", all.length], ["no", "纸质票没收到", all.length - got], ["yes", "纸质票已收到", got]]
+    .map(([k, t, n]) => `<button data-paper-filter="${k}" class="${state.paper === k ? "on" : ""}"><b>${n} 笔</b>${t}</button>`).join("")}</div>`;
   html += `<div class="filter"><input id="q" type="search" placeholder="搜车牌、司机、编号、金额" value="${esc(state.q)}">
     ${state.pick ? `<button class="chip" id="clearPick">${esc(state.pick)} ✕</button>` : ""}</div>`;
   $("app").innerHTML = html + `<div id="listBox"></div>`;
@@ -243,7 +320,7 @@ function renderList() {
   const all = state.items, list = filtered();
   const listSum = list.reduce((t, x) => t + x.amount, 0);
   let html = "";
-  if (state.pick || state.q) html += `<div class="day"><span>筛选出 ${list.length} 笔</span><b>SAR ${money(listSum)}</b></div>`;
+  if (state.pick || state.q || state.paper !== "all") html += `<div class="day"><span>筛选出 ${list.length} 笔</span><b>SAR ${money(listSum)}</b></div>`;
 
   let lastDay = "";
   let open = false;
@@ -265,14 +342,17 @@ function renderList() {
       }
     }
     if (!x.synced) tags.push(`<span class="tag">票夹还没收</span>`);
-    html += `<button class="item" data-i="${i}">
+    if (x.pc_status === "已报销") tags.push(`<span class="tag ok">已报销</span>`);
+    if (Math.abs(x.driverAmount - x.amount) > 0.004) tags.push(`<span class="tag mid">司机填 ${money(x.driverAmount)}，电脑上改过</span>`);
+    html += `<div class="item ${x.paper ? "got" : ""}" data-i="${i}" role="button">
       <div class="thumb">${x.photo ? `<img loading="lazy" decoding="async" src="${photoUrl(x.photo)}" alt="" onerror="this.outerHTML='照片<br>已清理'">` : "照片<br>已清理"}${x.gauge && x.gauge.photo ? `<span class="g">2张</span>` : ""}</div>
       <div class="info"><div class="l1"><span class="cat">${esc(x.name)}</span><span class="amt">${money(x.amount)}</span></div>
         <div class="l2">${esc(x.plate)} · ${esc(x.driver)} · ${hm(d)} · #${esc(x.code)}</div>
-        ${tags.length ? `<div class="tags">${tags.join("")}</div>` : ""}</div></button>`;
+        ${tags.length ? `<div class="tags">${tags.join("")}</div>` : ""}</div>
+      <button class="pp ${x.paper ? "on" : ""}" data-pp="${i}">${x.paper ? "✓ 已收<br>纸质票" : "没收<br>纸质票"}</button></div>`;
   });
   if (open) html += `</div>`;
-  if (!list.length && all.length) html += `<div class="empty">没有符合条件的票据</div>`;
+  if (!list.length && all.length) html += `<div class="empty">${state.paper === "no" && !state.q && !state.pick ? "🎉 这个月的纸质票都收齐了" : "没有符合条件的票据"}</div>`;
   $("listBox").innerHTML = html;
 }
 
@@ -282,6 +362,10 @@ $("app").addEventListener("click", e => {
   const pick = e.target.closest("[data-pick]");
   if (pick) { state.pick = state.pick === pick.dataset.pick ? "" : pick.dataset.pick; return render(); }
   if (e.target.closest("#clearPick")) { state.pick = ""; return render(); }
+  const pf = e.target.closest("[data-paper-filter]");
+  if (pf) { state.paper = pf.dataset.paperFilter; return render(); }
+  const pp = e.target.closest("[data-pp]");
+  if (pp) { const x = filtered()[+pp.dataset.pp]; if (x) setPaper(x, !x.paper); return; }
   const item = e.target.closest("[data-i]");
   if (item) return openViewer(filtered(), +item.dataset.i);
   const wait = e.target.closest("[data-wait]");
@@ -295,7 +379,7 @@ $("app").addEventListener("input", e => {
 function moveMonth(d) { state.month = new Date(state.month.getFullYear(), state.month.getMonth() + d, 1); state.pick = ""; state.items = []; fetchMonth(); }
 $("prevMonth").onclick = () => moveMonth(-1);
 $("nextMonth").onclick = () => moveMonth(1);
-$("reload").onclick = () => fetchMonth();
+$("reload").onclick = () => { state.manual = true; fetchMonth(); };
 
 // ============ 看大图：双指/滚轮放大，拖动移动，双击放大或还原，左右滑换下一张 ============
 const V = { list: [], i: 0, tab: 0, s: 1, x: 0, y: 0, img: null };
@@ -307,11 +391,20 @@ function photosOf(x) {
 }
 function openViewer(list, i, tab = 0) {
   V.list = list; V.i = i;
+  if (!$("viewer").classList.contains("show")) history.pushState({ viewer: true }, "");
   $("viewer").classList.add("show");
   document.body.style.overflow = "hidden";
+  themeColor("#0d1017");
   showItem(tab === 1 && list[i].waiting ? 0 : tab);
 }
-function closeViewer() { $("viewer").classList.remove("show"); document.body.style.overflow = ""; }
+// 看大图时在浏览器历史里多记一步：手机的返回键 / 返回手势先关掉大图，不会直接退出页面
+function closeViewer() {
+  if (!$("viewer").classList.contains("show")) return;
+  if (history.state && history.state.viewer) return history.back();   // 交给下面的 popstate 关
+  hideViewer();
+}
+function hideViewer() { $("viewer").classList.remove("show"); document.body.style.overflow = ""; themeColor("#2f4fd8"); }
+function themeColor(c) { const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = c; }
 function showItem(tab = 0) {
   const x = V.list[V.i], photos = photosOf(x);
   V.tab = Math.min(tab, photos.length - 1);
@@ -344,7 +437,7 @@ function showItem(tab = 0) {
   } else if (x.category === "Fuel") gaugeLine = `<div style="color:#ff9b8f">这笔油费没有加油前油量照片</div>`;
   $("vInfo").innerHTML = `<div class="big"><span>${esc(x.name)}</span><span>${x.waiting ? "" : "SAR " + money(x.amount)}</span></div>
     <div>${esc(x.plate)} · ${esc(x.driver)} · ${x.at.getMonth() + 1}月${x.at.getDate()}日 ${hm(x.at)} · #${esc(x.code)}　${V.i + 1}/${V.list.length}</div>
-    ${gaugeLine}<div class="v-hint">双指或滚轮放大 · 双击放大/还原 · 没放大时左右滑动换一张</div>`;
+    ${gaugeLine}${x.waiting ? "" : `<button class="v-paper ${x.paper ? "on" : ""}" id="vPaper">${x.paper ? "✓ 纸质票已收到（点一下改回没收到）" : "收到纸质票了？点这里标记"}</button>`}<div class="v-hint">双指或滚轮放大 · 双击放大/还原 · 没放大时左右滑动换一张</div>`;
 }
 function setT(s, x, y) {
   V.s = s; V.x = x; V.y = y;
@@ -417,6 +510,7 @@ function step(d) {
 $("vPrev").onclick = () => step(-1);
 $("vNext").onclick = () => step(1);
 $("vClose").onclick = closeViewer;
+$("vInfo").addEventListener("click", e => { if (e.target.id === "vPaper") { const x = V.list[V.i]; setPaper(x, !x.paper); } });
 $("vTabs").addEventListener("click", e => { const t = e.target.closest("[data-tab]"); if (t) showItem(+t.dataset.tab); });
 document.addEventListener("keydown", e => {
   if (!$("viewer").classList.contains("show")) return;
@@ -424,7 +518,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") step(-1);
   if (e.key === "ArrowRight") step(1);
 });
-window.addEventListener("popstate", closeViewer);
+window.addEventListener("popstate", hideViewer);
 
 fetchMonth();
 </script>
