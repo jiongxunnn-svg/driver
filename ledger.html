@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#121c33">
+<title>手机记账 · 票夹</title>
+<style>
+  :root {
+    --bg: #f4f6fa; --panel: #fff; --ink: #1b2538; --muted: #7d889b; --faint: #a3adbd; --line: #e8ecf2;
+    --primary: #4f6ef0; --primary-soft: #eef2ff; --green: #1a9e7a; --green-soft: #e8f7f2;
+    --orange: #c8801f; --orange-soft: #fff4e5; --purple: #7a55c2; --purple-soft: #f3eefb; --red: #d14b55; --red-soft: #fdeef0;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei UI", "Segoe UI", sans-serif; padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top)); background: #121c33; color: #fff; }
+  header b { font-size: 17px; letter-spacing: 1px; }
+  header small { color: #8fa0c2; font-size: 12px; }
+  .tabs { margin-left: auto; display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: rgba(255,255,255,.08); }
+  .tabs button { padding: 5px 14px; border: 0; border-radius: 8px; background: transparent; color: #a9b6d0; font-size: 14px; }
+  .tabs button.on { background: #4f6ef0; color: #fff; font-weight: 600; }
+  main { max-width: 560px; margin: 0 auto; padding: 14px 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .label { display: block; margin: 14px 0 7px; color: #4f5d75; font-size: 13px; font-weight: 600; }
+  .label:first-child { margin-top: 0; }
+  .label small { color: var(--faint); font-weight: 400; }
+  .ext { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; padding: 10px 12px; border: 1px dashed #c9d3f7; border-radius: 11px; background: #fafbff; font-size: 14px; }
+  .ext input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+  .ext small { color: var(--muted); font-size: 12px; }
+  .pill.x { color: #7a55c2; background: var(--purple-soft); }
+  .groups { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .groups button { padding: 12px 8px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; font-size: 15px; font-weight: 600; color: #44526a; }
+  .groups button.on { border-color: var(--primary); background: var(--primary-soft); color: #3550c4; }
+  .groups button[data-g="车辆使用费"].on { border-color: var(--purple); background: var(--purple-soft); color: #6040a8; }
+  .groups button[data-g="待处理费用"].on { border-color: var(--orange); background: var(--orange-soft); color: #a3620f; }
+  .subs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .subs button { padding: 7px 14px; border: 1px solid #dfe5ef; border-radius: 18px; background: #fff; color: #5d6a80; font-size: 14px; }
+  .subs button.on { border-color: #bdc9f7; background: var(--primary-soft); color: #3550c4; font-weight: 600; }
+  .input, .select { width: 100%; height: 46px; padding: 0 12px; border: 1px solid #dde3ee; border-radius: 11px; background: #fff; outline: none; font-size: 16px; }
+  .input:focus, .select:focus { border-color: #9fb0ef; box-shadow: 0 0 0 3px #eef2ff; }
+  .row { display: grid; grid-template-columns: 1fr 112px; gap: 8px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .amount { font-size: 22px; font-weight: 700; }
+  .calc { margin-top: 4px; color: var(--muted); font-size: 12px; min-height: 18px; }
+  .photo-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 46px; padding: 0 14px; border: 1px solid #dde3ee; border-radius: 11px; background: #fff; color: #44526a; font-size: 15px; font-weight: 600; }
+  .btn.primary { border-color: var(--primary); background: var(--primary); color: #fff; }
+  .btn:disabled { opacity: .55; }
+  .preview { position: relative; margin-top: 10px; }
+  .preview img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; background: #f1f3f7; display: block; }
+  .preview button { position: absolute; top: 8px; right: 8px; padding: 5px 12px; border: 0; border-radius: 8px; background: rgba(20,30,50,.7); color: #fff; font-size: 13px; }
+  .hint { color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+  .submit-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(244,246,250,.96); border-top: 1px solid var(--line); }
+  .submit-bar .btn { width: 100%; max-width: 528px; margin: 0 auto; display: flex; height: 52px; font-size: 17px; }
+  .error { margin-bottom: 12px; padding: 12px 14px; border-radius: 12px; background: var(--red-soft); color: #a2323c; font-size: 14px; font-weight: 600; }
+  .toast { position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 20; transform: translateX(-50%); max-width: 90vw; padding: 11px 18px; border-radius: 12px; background: #1b2538; color: #fff; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .busy { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(15,27,49,.4); }
+  .busy div { padding: 18px 24px; border-radius: 14px; background: #fff; font-weight: 600; }
+  /* 看账 */
+  .fund { padding: 16px; border-radius: 14px; color: #fff; background: linear-gradient(140deg, #4f6ef0, #6a5ad8); margin-bottom: 12px; }
+  .fund.ok { background: linear-gradient(140deg, #1a9e7a, #2f8fb0); }
+  .fund.tight { background: linear-gradient(140deg, #d9902a, #c8641f); }
+  .fund.bad { background: linear-gradient(140deg, #d14b55, #b23a62); }
+  .fund .t { opacity: .85; font-size: 13px; }
+  .fund .v { font-size: 28px; font-weight: 700; margin: 2px 0; }
+  .fund .s { opacity: .9; font-size: 13px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .tile { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+  .tile .n { color: var(--muted); font-size: 12px; }
+  .tile .v { font-size: 18px; font-weight: 700; margin-top: 2px; }
+  .tile .s { color: var(--faint); font-size: 12px; }
+  h3 { margin: 18px 4px 8px; font-size: 14px; color: #4f5d75; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-bottom: 1px solid #f0f2f6; }
+  .item:last-child { border-bottom: 0; }
+  .item .m { flex: 1; min-width: 0; }
+  .item .tt { font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .item .ss { color: var(--faint); font-size: 12px; }
+  .item .a { font-weight: 700; color: #4b3a8c; white-space: nowrap; text-align: right; }
+  .pill { display: inline-block; padding: 1px 7px; border-radius: 6px; font-size: 11px; margin-top: 2px; }
+  .pill.p { color: #b0731d; background: var(--orange-soft); }
+  .pill.s { color: #3f58c0; background: var(--primary-soft); }
+  .pill.d { color: #22876b; background: var(--green-soft); }
+  .pill.w { color: #7d889b; background: #eef1f6; }
+  .list { padding: 0; overflow: hidden; }
+  .empty { padding: 22px; text-align: center; color: var(--faint); font-size: 13px; }
+  .gate { padding: 30px 20px; text-align: center; }
+</style>
+</head>
+<body>
+<header><div><b>手机记账</b><br><small>记好的账自动进票夹的账本</small></div>
+  <div class="tabs"><button class="on" data-tab="add">记一笔</button><button data-tab="view">看账</button></div></header>
+
+<main>
+  <div class="error" id="error" hidden></div>
+
+  <div class="card gate" id="gate" hidden>
+    <p style="font-size:16px;font-weight:600">请用票夹里复制的手机记账链接打开</p>
+    <p class="hint">在电脑上打开票夹 → 账本 → 「复制手机记账链接」，发到手机上点开就行。打开一次以后会记住。</p>
+  </div>
+
+  <!-- ===================== 记一笔 ===================== -->
+  <section id="tab-add">
+    <div class="card">
+      <span class="label">大类</span>
+      <div class="groups" id="groups"></div>
+      <div id="subWrap"><span class="label">小类</span><div class="subs" id="subs"></div></div>
+      <label class="ext" id="extWrap" hidden><input type="checkbox" id="external"><span><b>对外付款</b><br><small>公司直接付给别人的，不是我垫的钱：不算进待报销，也不影响手上资金</small></span></label>
+
+      <span class="label">事由 <small id="titleHint"></small></span>
+      <input class="input" id="title" list="titleList" maxlength="80" placeholder="比如：食堂采购、加油、签证费" autocomplete="off">
+      <datalist id="titleList"></datalist>
+
+      <span class="label">金额 <small>可以写算式，比如 46+10+22</small></span>
+      <div class="row">
+        <input class="input amount" id="amount" inputmode="decimal" placeholder="0.00" autocomplete="off">
+        <select class="select" id="currency"><option value="SAR">SAR</option><option value="AED">AED</option><option value="CNY">CNY</option><option value="USD">USD</option></select>
+      </div>
+      <div class="calc" id="calc"></div>
+
+      <div class="row2">
+        <div><span class="label">日期</span><input class="input" id="date" type="date"></div>
+        <div><span class="label">费用发生人</span><input class="input" id="person" list="personList" maxlength="40" placeholder="谁花的" autocomplete="off"><datalist id="personList"></datalist></div>
+      </div>
+
+      <span class="label">备注 <small>可不填</small></span>
+      <input class="input" id="note" maxlength="200" placeholder="比如：4 人晚餐、司机 waqas" autocomplete="off">
+
+      <span class="label">票据照片 <small>可拍可不拍</small></span>
+      <div class="photo-btns">
+        <button class="btn" id="shootBtn" type="button">📷 拍票</button>
+        <button class="btn" id="pickBtn" type="button">🖼️ 相册选</button>
+      </div>
+      <input type="file" id="shootInput" accept="image/*" capture="environment" hidden>
+      <input type="file" id="pickInput" accept="image/*" hidden>
+      <div class="preview" id="preview" hidden><img id="previewImg" alt=""><button type="button" id="removePhoto">去掉照片</button></div>
+      <div class="hint">拍了票的，票夹收到时会把照片存进归档库（待报销），并和这笔账连在一起；不拍的只记账。</div>
+    </div>
+  </section>
+
+  <!-- ===================== 看账 ===================== -->
+  <section id="tab-view" hidden>
+    <div class="fund" id="fund"><div class="t">手上资金</div><div class="v" id="fundValue">—</div><div class="s" id="fundSub">打开票夹后会显示</div></div>
+    <div class="grid4" id="tiles"></div>
+    <h3 id="waitTitle" hidden>⏳ 等电脑收取</h3>
+    <div class="card list" id="waitList" hidden></div>
+    <h3>最近的账</h3>
+    <div class="card list" id="recentList"><div class="empty">读取中…</div></div>
+    <div class="hint" id="viewTime" style="text-align:center"></div>
+  </section>
+</main>
+
+<div class="submit-bar" id="submitBar"><button class="btn primary" id="submitBtn">记一笔</button></div>
+<div class="toast" id="toast" hidden></div>
+<div class="busy" id="busy" hidden><div id="busyText">正在保存…</div></div>
+
+<script>
+// ============================================== 设置（和司机网页同一个 Supabase 项目）
+const SUPABASE_URL = "https://klltpjccnretfccnrvpo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xFOiQOnp0CbPfwu18oN1xQ_exb8LpF9";
+const BUCKET = "ledger_photos";
+const GROUPS = [
+  { name: "后勤食堂费用", short: "🍳 后勤食堂", subs: ["能量饮料", "师傅采购", "其他"] },
+  { name: "车辆使用费", short: "🚗 车辆使用", subs: ["加油", "司机加班餐", "修车洗车停车"] },
+  { name: "单项报销", short: "🧾 单项报销", subs: ["签证", "其他"] },
+  { name: "待处理费用", short: "📌 待处理", subs: [] },
+];
+// ==============================================
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const money = v => Number(v || 0).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function store(key, value) {
+  try { if (value === undefined) return localStorage.getItem(key) || ""; localStorage.setItem(key, value); } catch (e) { return ""; }
+}
+// 口令：链接里带的存下来，然后从地址栏去掉
+let accessKey = new URLSearchParams(location.search).get("k") || "";
+if (accessKey) { store("ledger_k", accessKey); history.replaceState(null, "", location.pathname); }
+else accessKey = store("ledger_k");
+
+const state = { group: store("ledger_group") || "后勤食堂费用", sub: "", photo: null, uploaded: "", uploadedFor: null, mirror: null };
+
+function headers(extra) {
+  const h = Object.assign({ apikey: SUPABASE_KEY }, extra || {});
+  if (SUPABASE_KEY.startsWith("eyJ")) h.Authorization = "Bearer " + SUPABASE_KEY;
+  return h;
+}
+async function rpc(name, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, { method: "POST", headers: headers({ "Content-Type": "application/json" }), body: JSON.stringify(body) });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text);
+  return text ? JSON.parse(text) : null;
+}
+function uuid() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+}
+async function uploadPhoto(blob) {
+  const path = `${uuid()}.jpg`;
+  const up = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, { method: "POST", headers: headers({ "Content-Type": "image/jpeg", "x-upsert": "false" }), body: blob });
+  if (!up.ok) throw new Error("UPLOAD_" + up.status + " " + (await up.text()).slice(0, 200));
+  return path;
+}
+function explain(err) {
+  const msg = String(err && err.message || err);
+  if (msg.includes("BAD_LINK")) return "链接不对或者口令换了，请从票夹里重新复制手机记账链接。";
+  if (msg.includes("NO_PHOTO")) { state.uploaded = ""; return "照片没传上去，请再点一次「记一笔」。"; }
+  if (msg.includes("NO_AMOUNT")) return "没拍票的话要填金额。";
+  if (msg.includes("NO_TITLE")) return "请填写事由。";
+  if (msg.includes("BAD_DATE")) return "日期不对。";
+  if (msg.includes("ledger_inbox") || msg.includes("submit_ledger") || msg.includes("PGRST202")) return "云端还没设置好（或者是旧版）：要在 Supabase 里再运行一次 ledger_setup.sql。";
+  if (err instanceof TypeError) return "没有网络，请检查网络后再点一次。";
+  return "出错了，请再试一次。<br><small style='font-weight:400'>" + esc(msg).slice(0, 140) + "</small>";
+}
+function showError(text) { $("error").innerHTML = text ? "⚠️ " + text : ""; $("error").hidden = !text; if (text) window.scrollTo({ top: 0, behavior: "smooth" }); }
+let toastTimer = 0;
+function toast(text) { $("toast").textContent = text; $("toast").hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; }, 3500); }
+function busy(text) { $("busy").hidden = !text; if (text) $("busyText").textContent = text; }
+
+// ---------------------------------------------- 金额算式
+function evalAmount(text) {
+  const s = String(text || "").trim().replace(/[，,]/g, "").replace(/[×xX]/g, "*").replace(/÷/g, "/").replace(/（/g, "(").replace(/）/g, ")");
+  if (!s) return null;
+  if (!/^[0-9.+\-*/() ]+$/.test(s)) throw new Error("金额只能写数字和 + - * / ( )");
+  const v = Function('"use strict";return (' + s + ")")();
+  if (!isFinite(v)) throw new Error("算式不对");
+  return Math.round(v * 100) / 100;
+}
+$("amount").addEventListener("input", () => {
+  try {
+    const v = evalAmount($("amount").value);
+    $("calc").textContent = v !== null && /[+\-*/]/.test($("amount").value.replace(/^-/, "")) ? `= ${money(v)}` : "";
+  } catch (e) { $("calc").textContent = e.message; }
+});
+
+// ---------------------------------------------- 大类、小类
+function renderGroups() {
+  $("groups").innerHTML = GROUPS.map(g => `<button type="button" data-g="${g.name}" class="${g.name === state.group ? "on" : ""}">${g.short}</button>`).join("");
+  const g = GROUPS.find(x => x.name === state.group) || GROUPS[0];
+  if (!g.subs.includes(state.sub)) state.sub = store("ledger_sub_" + g.name) || g.subs[0] || "";
+  if (!g.subs.includes(state.sub)) state.sub = g.subs[0] || "";
+  $("subWrap").hidden = !g.subs.length;
+  $("subs").innerHTML = g.subs.map(s => `<button type="button" data-s="${s}" class="${s === state.sub ? "on" : ""}">${s}</button>`).join("");
+  $("titleHint").textContent = state.group === "待处理费用" ? "没票或票丢了的，记一笔是一笔" : "";
+  $("extWrap").hidden = state.group !== "单项报销";
+  if (state.group !== "单项报销") $("external").checked = false;
+}
+$("groups").addEventListener("click", e => {
+  const b = e.target.closest("[data-g]"); if (!b) return;
+  state.group = b.dataset.g; store("ledger_group", state.group); renderGroups();
+});
+$("subs").addEventListener("click", e => {
+  const b = e.target.closest("[data-s]"); if (!b) return;
+  state.sub = b.dataset.s; store("ledger_sub_" + state.group, state.sub); renderGroups();
+  if (!$("title").value.trim() && state.sub !== "其他") $("title").placeholder = state.sub;
+});
+
+// ---------------------------------------------- 照片
+function loadImage(file) {
+  return new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = URL.createObjectURL(file); });
+}
+async function shrink(file) {
+  const img = await loadImage(file);
+  for (const [max, quality] of [[1800, 0.82], [1400, 0.75], [1100, 0.7]]) {
+    const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.naturalWidth * scale); canvas.height = Math.round(img.naturalHeight * scale);
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise(r => canvas.toBlob(r, "image/jpeg", quality));
+    if (blob && blob.size < 2.5 * 1024 * 1024) return blob;
+  }
+  throw new Error("照片太大了");
+}
+async function takePhoto(input) {
+  const file = input.files && input.files[0]; input.value = "";
+  if (!file) return;
+  try {
+    busy("正在处理照片…");
+    state.photo = await shrink(file); state.uploaded = ""; state.uploadedFor = null;
+    $("previewImg").src = URL.createObjectURL(state.photo); $("preview").hidden = false;
+  } catch (e) { showError("这张照片打不开，换一张试试。"); }
+  finally { busy(""); }
+}
+$("shootBtn").onclick = () => $("shootInput").click();
+$("pickBtn").onclick = () => $("pickInput").click();
+$("shootInput").onchange = () => takePhoto($("shootInput"));
+$("pickInput").onchange = () => takePhoto($("pickInput"));
+$("removePhoto").onclick = () => { state.photo = null; state.uploaded = ""; $("preview").hidden = true; };
+
+// ---------------------------------------------- 提交
+$("submitBtn").addEventListener("click", async () => {
+  showError("");
+  if (!accessKey) return showError("请用票夹里复制的手机记账链接打开。");
+  let amount;
+  try { amount = evalAmount($("amount").value); } catch (e) { return showError(e.message); }
+  if (amount !== null && amount <= 0) return showError("金额要大于 0。");
+  const title = $("title").value.trim() || (state.sub && state.sub !== "其他" ? state.sub : "");
+  if (!state.photo && amount === null) return showError("没拍票的话要填金额。");
+  if (!state.photo && !title) return showError("请填写事由。");
+  const date = $("date").value || today();
+  $("submitBtn").disabled = true;
+  try {
+    if (state.photo && (!state.uploaded || state.uploadedFor !== state.photo)) {
+      busy("正在上传照片…");
+      state.uploaded = await uploadPhoto(state.photo); state.uploadedFor = state.photo;
+    }
+    busy("正在保存…");
+    await rpc("submit_ledger", {
+      p_key: accessKey, p_date: date, p_grp: state.group, p_sub: state.sub, p_title: title, p_amount: amount,
+      p_currency: $("currency").value, p_person: $("person").value.trim(), p_note: $("note").value.trim(),
+      p_photo: state.photo ? state.uploaded : null,
+      ...($("external").checked ? { p_external: true } : {}),   // 不勾就不传，旧版云端脚本也能用
+    });
+    store("ledger_person", $("person").value.trim()); store("ledger_currency", $("currency").value);
+    toast(`记好了：${title || state.group} ${amount !== null ? money(amount) : "（金额待补）"}`);
+    $("title").value = ""; $("amount").value = ""; $("note").value = ""; $("calc").textContent = ""; $("external").checked = false;
+    state.photo = null; state.uploaded = ""; $("preview").hidden = true;
+    loadView();
+  } catch (e) { showError(explain(e)); }
+  finally { busy(""); $("submitBtn").disabled = false; }
+});
+
+// ---------------------------------------------- 看账
+const STATUS = { "待报销": "p", "中台已提单": "s", "已到账": "d" };
+async function loadView() {
+  if (!accessKey) return;
+  try {
+    const data = await rpc("ledger_view", { p_key: accessKey });
+    state.mirror = data.mirror || null;
+    renderView(data);
+    fillSuggest();
+  } catch (e) {
+    if (!$("tab-view").hidden) showError(explain(e));
+  }
+}
+function renderView(data) {
+  const m = data.mirror, s = (m && m.summary) || null;
+  const fund = $("fund");
+  fund.className = "fund " + (s ? s.level : "");
+  if (!s) { $("fundValue").textContent = "—"; $("fundSub").textContent = "电脑上打开票夹后，这里会显示总数"; }
+  else {
+    $("fundValue").textContent = s.cash === null || s.cash === undefined ? "还没填" : "SAR " + money(s.cash);
+    const tip = { ok: "资金够用", tight: "资金偏紧", bad: "资金不够了", unknown: "在电脑票夹首页填一下手上资金" }[s.level] || "";
+    // 手上资金会自己变：收到票（记一笔）减，中台打款加
+    $("fundSub").textContent = [tip, s.days !== null && s.days !== undefined ? `按最近平均每天 ${money(s.per_day)}，约够 ${s.days} 天` : ""].filter(Boolean).join(" · ");
+  }
+  const tiles = [];
+  if (s) {
+    tiles.push(`<div class="tile"><div class="n">待报销</div><div class="v">${money(s.pending)}</div><div class="s">${s.pending_n} 笔${s.pending_missing ? ` · ${s.pending_missing} 笔缺金额` : ""}</div></div>`);
+    tiles.push(`<div class="tile"><div class="n">中台已提单（等到账）</div><div class="v">${money(s.submitted)}</div><div class="s">${s.submitted_n} 笔</div></div>`);
+    tiles.push(`<div class="tile"><div class="n">待处理费用</div><div class="v">${money(s.handling)}</div><div class="s">${s.handling_n} 笔</div></div>`);
+    tiles.push(`<div class="tile"><div class="n">我欠别人 / 别人欠我</div><div class="v">${money(s.i_owe)}</div><div class="s">别人欠我 ${money(s.owe_me)}</div></div>`);
+    for (const g of s.groups || []) if (g.name !== "待处理费用")
+      tiles.push(`<div class="tile"><div class="n">${esc(g.name)} · 待报销</div><div class="v">${money(g.pending)}</div><div class="s">${g.pending_n} 笔${g.pending_missing ? ` · ${g.pending_missing} 笔缺金额` : ""}</div></div>`);
+  }
+  $("tiles").innerHTML = tiles.join("");
+  const wait = data.waiting || [];
+  $("waitTitle").hidden = $("waitList").hidden = !wait.length;
+  $("waitList").innerHTML = wait.map(w => `<div class="item"><div class="m"><div class="tt">${esc(w.title || w.grp)}${w.photo ? " 📎" : ""}</div><div class="ss">${esc(w.spent_on)} · ${esc(w.grp)}${w.sub ? "·" + esc(w.sub) : ""}${w.person ? " · " + esc(w.person) : ""}</div></div><div class="a">${w.amount !== null ? money(w.amount) : "—"}<br>${w.external ? `<span class="pill x">对外付款</span> ` : ""}<span class="pill w">等电脑收取</span></div></div>`).join("");
+  const recent = (m && m.recent) || [];
+  $("recentList").innerHTML = recent.length ? recent.map(r => `<div class="item"><div class="m"><div class="tt">${esc(r.title)}${r.files ? ` 📎${r.files > 1 ? r.files : ""}` : ""}</div><div class="ss">${esc(r.date)} · ${esc(r.group)}${r.sub ? "·" + esc(r.sub) : ""}${r.person ? " · " + esc(r.person) : ""}</div></div><div class="a">${r.amount !== null && r.amount !== undefined ? (r.currency && r.currency !== "SAR" ? esc(r.currency) + " " : "") + money(r.amount) : "缺金额"}<br>${r.external ? `<span class="pill x">对外付款</span> ` : ""}<span class="pill ${STATUS[r.status] || "w"}">${esc(r.status)}</span></div></div>`).join("")
+    : `<div class="empty">${m ? "还没有账" : "电脑上打开票夹后，这里会显示账本"}</div>`;
+  $("viewTime").textContent = data.mirror_at ? "电脑上的账本更新于 " + new Date(data.mirror_at).toLocaleString("zh-CN", { hour12: false }) : "";
+}
+function fillSuggest() {
+  const m = state.mirror || {};
+  $("titleList").innerHTML = (m.titles || []).map(t => `<option value="${esc(t)}">`).join("");
+  $("personList").innerHTML = (m.persons || []).map(t => `<option value="${esc(t)}">`).join("");
+}
+
+// ---------------------------------------------- 切换
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x === b));
+  $("tab-add").hidden = b.dataset.tab !== "add"; $("tab-view").hidden = b.dataset.tab !== "view";
+  $("submitBar").hidden = b.dataset.tab !== "add";
+  showError("");
+  if (b.dataset.tab === "view") loadView();
+}));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) loadView(); });
+
+// ---------------------------------------------- 启动
+$("date").value = today();
+$("person").value = store("ledger_person");
+if (store("ledger_currency")) $("currency").value = store("ledger_currency");
+renderGroups();
+if (!accessKey) { $("gate").hidden = false; $("tab-add").hidden = true; $("submitBar").hidden = true; }
+else loadView();
+</script>
+</body>
+</html>
